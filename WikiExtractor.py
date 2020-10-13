@@ -2737,7 +2737,7 @@ class OutputSplitter(object):
 tagRE = re.compile(r'(.*?)<(/?\w+)[^>]*?>(?:([^<]*)(<.*?>)?)?')
 #                    1     2               3      4
 keyRE = re.compile(r'key="(\d*)"')
-catRE = re.compile(r'\[\[Category:([^\|]+).*\]\].*')  # capture the category name [[Category:Category name|Sortkey]]"
+catRE = re.compile(r'\[\[Categorie:([^\|]+).*\]\].*')  # capture the category name [[Categorie:Category name|Sortkey]]"
 
 def load_templates(file, output_file=None):
     """
@@ -2801,14 +2801,14 @@ def pages_from(input):
     title = None
     for line in input:
         if not isinstance(line, text_type): line = line.decode('utf-8')
+        # extract categories
+        if line.lstrip().startswith('[[Cat'):
+            mCat = catRE.search(line)
+            if mCat:
+                catSet.add(mCat.group(1))
         if '<' not in line:  # faster than doing re.search()
             if inText:
                 page.append(line)
-                # extract categories
-                if line.lstrip().startswith('[[Category:'):
-                    mCat = catRE.search(line)
-                    if mCat:
-                        catSet.add(mCat.group(1))
             continue
         m = tagRE.search(line)
         if not m:
@@ -3271,7 +3271,7 @@ def main():
                         options.filter_category_include.add(line)
                 except Exception as e:
                     error_cnt += 1
-                    print(u"Category not in utf8, ignored. error cnt %d:\t%s" % (error_cnt,e))
+                    print(u"Categorie not in utf8, ignored. error cnt %d:\t%s" % (error_cnt,e))
                     print(line)
             logging.info("Excluding categories:",)
             logging.info(str(options.filter_category_exclude))
